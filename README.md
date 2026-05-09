@@ -1,10 +1,10 @@
 # jetlinks-product
 
-A Claude Agent Skill that codifies a "propose-before-implement, stage-by-stage" product design and engineering delivery flow used across JetLinks-style multi-module repositories.
+An agent skill that codifies a "propose-before-implement, stage-by-stage" product design and engineering delivery flow used across JetLinks-style multi-module repositories.
 
 ## What this skill provides
 
-When the user starts a new feature, scopes a complex multi-stage delivery, or onboards to a JetLinks-style project, this skill teaches Claude to:
+When the user starts a new feature, scopes a complex multi-stage delivery, or onboards to a JetLinks-style project, this skill teaches the agent to:
 
 1. Hold a **collaboration philosophy** (propose alternatives before implementing, wait for user sign-off, stage by stage, never silently revert, never fabricate metrics).
 2. Apply a **four-layer doc taxonomy** — `CLAUDE.md` (entry) / `docs/constitution/` (long-term rules) / `docs/requirements/` (business blueprints) / `docs/tasks/` (per-delivery context).
@@ -14,23 +14,26 @@ When the user starts a new feature, scopes a complex multi-stage delivery, or on
 
 ## Installation
 
-### With cc-switch (recommended)
+### With a skill installer
 
 ```text
-Open cc-switch → Skills tab → "Install from GitHub" → paste this repo URL.
+Install from GitHub:
+https://github.com/superzoc/jetlinks-product
 ```
 
 ### Manual
 
 Copy the folder to one of:
 
+- `~/.codex/skills/jetlinks-product/` (Codex user-level)
 - `~/.claude/skills/jetlinks-product/` (user-level, all projects)
+- `<project>/.codex/skills/jetlinks-product/` (Codex project-level)
 - `<project>/.claude/skills/jetlinks-product/` (project-level)
-- An Anthropic skills directory recognized by your Claude client.
+- Any SKILL.md-compatible skills directory recognized by your agent client.
 
 ## Usage
 
-Once installed, just describe the task naturally — Claude will pick this skill up when triggered (see frontmatter description in `SKILL.md`). Common triggers:
+Once installed, describe the task naturally — the agent should pick this skill up when triggered (see frontmatter description in `SKILL.md`). Common triggers:
 
 - "Start designing module X"
 - "Build a complex task package for feature Y"
@@ -66,8 +69,8 @@ Distilled from a real run-through in `jetlinks-ai-app` (a high-fidelity prototyp
 
 ## Status
 
-v0.1 draft. Verified once on a real module (`mod-behavior-analysis`); not yet packaged for cc-switch installation. See [SKILL.md](./SKILL.md) for the full content.
+v0.1 public draft. Verified once on a real module (`mod-behavior-analysis`). See [SKILL.md](./SKILL.md) for the full content.
 
 ## License
 
-MIT (or whatever the parent skill repo uses).
+MIT.

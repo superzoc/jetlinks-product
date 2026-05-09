@@ -1,6 +1,6 @@
 ---
 name: jetlinks-product
-description: Use when the user starts a new feature, scopes a complex multi-stage delivery, onboards to a JetLinks-style multi-module repo (cloud.jetlinks, runtime-ui, manager modules), or asks Claude to "follow the design flow / propose before implementing / build a task package". Provides a five-rule collaboration philosophy (propose alternatives, wait for sign-off, stage by stage, never silently revert, never fabricate metrics), a four-layer doc taxonomy (entry / constitution / requirements / tasks), simple-vs-complex task package decision and templates, a high-fidelity HTML mockup sinking method that ties into the task package, and a must-read index pattern that resolves which long-term docs to read for the incoming task.
+description: Use when the user starts a new feature, scopes a complex multi-stage delivery, onboards to a JetLinks-style multi-module repo (cloud.jetlinks, runtime-ui, manager modules), or asks the agent to "follow the design flow / propose before implementing / build a task package". Provides a five-rule collaboration philosophy (propose alternatives, wait for sign-off, stage by stage, never silently revert, never fabricate metrics), a four-layer doc taxonomy (entry / constitution / requirements / tasks), simple-vs-complex task package decision and templates, a high-fidelity HTML mockup sinking method that ties into the task package, and a must-read index pattern that resolves which long-term docs to read for the incoming task.
 ---
 
 # JetLinks Design Flow
@@ -12,7 +12,7 @@ A reusable collaboration protocol for product design and engineering delivery in
 Invoke when any of the following is true:
 
 - The user is starting a new feature or module ("design X", "build Y", "let's plan Z").
-- The user is onboarding Claude to a repo that already uses a `CLAUDE.md` + `docs/constitution/` + `docs/requirements/` + `docs/tasks/` layout.
+- The user is onboarding an agent to a repo that already uses a `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` + `docs/constitution/` + `docs/requirements/` + `docs/tasks/` layout.
 - The user explicitly asks to "follow the design flow", "propose before implementing", "build a task package", or "stage by stage".
 - The work involves multiple collaboration stages (requirements → UI review → implementation → verification → handoff) or multi-model handoff.
 - The user requests high-fidelity HTML mockups bound to a delivery plan.
@@ -31,7 +31,7 @@ Five collaboration rules apply to every interaction once this skill is active. F
 
 ## Four-layer document taxonomy
 
-Every project Claude works in via this skill should follow (or be guided toward) this layout. Full mapping in `references/document-layering.md`.
+Every project an agent works in via this skill should follow (or be guided toward) this layout. Full mapping in `references/document-layering.md`.
 
 | Layer | Path | Owns | Forbidden content |
 |---|---|---|---|
