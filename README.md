@@ -31,6 +31,12 @@ Copy the folder to one of:
 - `<project>/.claude/skills/jetlinks-product/` (project-level)
 - Any SKILL.md-compatible skills directory recognized by your agent client.
 
+### Project-specific integration
+
+Some projects need extra wiring (e.g. `AGENTS.md` references, must-read index setup, coexistence with other skills). Per-project guides live under [`docs/integrations/`](./docs/integrations/):
+
+- [cloud.jetlinks](./docs/integrations/cloud-jetlinks.md) — JetLinks Pro multi-module repo (backend + runtime-ui + ui)
+
 ## Usage
 
 Once installed, describe the task naturally — the agent should pick this skill up when triggered (see frontmatter description in `SKILL.md`). Common triggers:
