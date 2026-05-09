@@ -14,14 +14,19 @@
 
 ## 修改范围
 
-- `app/...`
+<!-- 列出本任务实际触及的代码 / 配置 / 文档路径。多栈仓库（如后端 + 前端）按栈分别列出。 -->
+
+- `<your-stack-prefix>/...`
 - `docs/...`
 
 ## 读取要求
 
-- `AGENTS.md`
-- `docs/constitution/...`
+<!-- 仅列出本任务实际相关的 must-reads；没有的层级直接删行（如仓库无 docs/constitution/）。 -->
+
+- `AGENTS.md` 或 `CLAUDE.md`（按你仓库的入口约定）
+- `docs/constitution/...`（如存在）
 - `docs/requirements/...`
+- 相关模块 README
 
 ## 执行步骤
 

@@ -12,7 +12,7 @@ A reusable collaboration protocol for product design and engineering delivery in
 Invoke when any of the following is true:
 
 - The user is starting a new feature or module ("design X", "build Y", "let's plan Z").
-- The user is onboarding an agent to a repo that already uses a `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` + `docs/constitution/` + `docs/requirements/` + `docs/tasks/` layout.
+- The user is onboarding an agent to a repo that already uses a `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` entry doc plus some combination of `docs/constitution/` (optional) / `docs/requirements/` / `docs/tasks/` directories.
 - The user explicitly asks to "follow the design flow", "propose before implementing", "build a task package", or "stage by stage".
 - The work involves multiple collaboration stages (requirements → UI review → implementation → verification → handoff) or multi-model handoff.
 - The user requests high-fidelity HTML mockups bound to a delivery plan.
@@ -35,12 +35,14 @@ Every project an agent works in via this skill should follow (or be guided towar
 
 | Layer | Path | Owns | Forbidden content |
 |---|---|---|---|
-| Entry | `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` | Collab rules, must-read index, engineering quick-ref | Business rules |
-| Long-term rules | `docs/constitution/` | Architecture, engineering, UI tokens, ADRs | Per-feature business design |
+| Entry | `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` (any one is sufficient; multi-stack repos often use `AGENTS.md` as canonical and have `CLAUDE.md` bridge to it) | Collab rules, must-read index, engineering quick-ref | Business rules |
+| Long-term rules (**optional**) | `docs/constitution/` | Architecture, engineering, UI tokens, ADRs | Per-feature business design |
 | Business blueprints | `docs/requirements/` | Per-feature specs, fields, flows | Coding conventions |
 | Per-delivery | `docs/tasks/` | A single delivery's context, plan, verification, handoff | Long-term truth |
 
 Cross-layer rule: stable conclusions migrate **upward** (tasks → requirements / constitution). Long-term rules never live inside a task package.
+
+**Constitution is optional.** Repos that don't yet need cross-cutting long-term rules (or that keep them inline in module READMEs / root `AGENTS.md`) can skip `docs/constitution/` entirely. The skill still works — task packages just point at module READMEs or `AGENTS.md` sections in their must-read list. Only introduce `docs/constitution/` when cross-cutting rules emerge that don't fit any single module.
 
 ## Task package decision tree
 
@@ -99,12 +101,12 @@ Before touching code on any incoming task, resolve which long-term docs the task
 
 The convention:
 
-1. **`CLAUDE.md` maintains a "scope → required reads" mapping table** (per-business-domain).
+1. **The repo's entry doc** (`CLAUDE.md` or `AGENTS.md` or `GEMINI.md`) **maintains a "scope → required reads" mapping table** (per-business-domain). Repos without an explicit table fall back to: list the must-reads inline in each task package's `README.md`, sourced from `AGENTS.md` skill routing + module READMEs + relevant `requirements/*.md`.
 2. On task intake, list the business scopes the task touches.
-3. For each scope, read the corresponding `constitution/*.md` + `requirements/*.md` files in full (or the relevant sections if >1200 lines).
+3. For each scope, read the corresponding `constitution/*.md` (if present) + `requirements/*.md` + module README files in full (or the relevant sections if >1200 lines).
 4. Only then propose alternatives.
 
-Reading the index is non-negotiable for new features and IA changes. Skip it for trivial fixes (1–2 files).
+Reading the must-reads is non-negotiable for new features and IA changes. Skip it for trivial fixes (1–2 files).
 
 ## Quick start
 
@@ -121,7 +123,7 @@ cp -r "$SKILL_DIR/assets/complex-task-package/." "docs/tasks/$TASK/"
 
 1. Pick a name following the project's existing naming pattern (e.g. `module-<slug>.md`, `application-<area>.md`).
 2. Copy `assets/requirements-doc-header.md` to the top of the new file.
-3. Register the file in `CLAUDE.md` "scope → required reads" table so future tasks pick it up.
+3. Register the file in your entry doc's "scope → required reads" table (or inline must-reads in future task package READMEs if your repo doesn't carry an index).
 
 ### Sink mockups into a task package
 
@@ -138,18 +140,34 @@ cp -r "$SKILL_DIR/assets/complex-task-package/." "docs/tasks/$TASK/"
 | `references/document-layering.md` | 4-layer taxonomy details + migration rules | Setting up a new repo or moving content between layers |
 | `references/task-package-protocol.md` | Decision tree, naming, archive, handoff conventions | Creating, transitioning, or archiving a task |
 | `references/mockup-sinking-method.md` | HTML mockup conventions, flow-nav style, design tokens | Doing UI review stage |
-| `references/must-read-index-pattern.md` | How `CLAUDE.md` maintains the index, how Claude resolves it on intake | Onboarding to a new repo or starting any feature task |
+| `references/must-read-index-pattern.md` | How the entry doc (CLAUDE/AGENTS/GEMINI) hosts the must-read index, fallback when no index exists | Onboarding to a new repo or starting any feature task |
 | `assets/simple-task.md` | Single-file simple task template | Creating a 3–5 file task |
 | `assets/requirements-doc-header.md` | The 4-line frontmatter every requirements doc carries | Authoring a new requirements doc |
 | `assets/complex-task-package/` | 6-file complex task package template | Creating a complex task |
+
+## Repo shapes this skill accommodates
+
+The skill is stack-agnostic and adapts to several repo shapes:
+
+| Shape | Example | Entry doc | Constitution? | Stack layout |
+|---|---|---|---|---|
+| Single-stack prototype | Nuxt or Next monorepo | `CLAUDE.md` or `AGENTS.md` | usually present | one `app/` or `src/` tree |
+| Multi-stack monorepo | Java backend + Vue frontend in one repo | `AGENTS.md` (canonical) + `CLAUDE.md` (bridge) | often deferred | separate `<backend-modules>/` + `<frontend>/` trees |
+| Multi-module Maven workspace | several backend services + git submodules | `AGENTS.md` | often deferred | `modules/`, `runtime/`, `control/`, plus `.gitmodules` |
+
+Implications:
+
+- **Multi-stack file scope**: in `README.md` and `01-requirements.md`, list both backend and frontend file ranges explicitly under separate sub-headings. A full-stack feature touching `<backend>/<feature>/` AND `<frontend>/<feature>-ui/` is one delivery — keep it in one task package, but enumerate both stacks in the file scope table.
+- **Submodule awareness**: if the repo uses `.gitmodules`, list submodule directories explicitly under "do not touch" in your task package, and verify `git status` shows no submodule pointer changes before commit.
+- **No-constitution fallback**: if `docs/constitution/` doesn't exist, the must-read list points at module READMEs + `AGENTS.md` sections instead. Don't fabricate a constitution doc just to satisfy the skill — the skill works without it.
 
 ## Out of scope
 
 This skill does **not** prescribe:
 
-- Coding conventions (live in `docs/constitution/engineering.md` per project)
-- UI tokens / visual rules (live in `docs/constitution/design.md` per project)
-- Service layer / data layer architecture (live in `docs/constitution/service-layer.md` per project)
+- Coding conventions (live in `docs/constitution/engineering.md` if present, or in module READMEs / `AGENTS.md` otherwise)
+- UI tokens / visual rules (live in `docs/constitution/design.md` if present, or in frontend module READMEs)
+- Service layer / data layer architecture (live in `docs/constitution/service-layer.md` if present, or in backend module READMEs)
 - Specific business rules (live in `docs/requirements/*.md` per project)
 
-Use this skill **alongside** the project's own constitution and requirements — it provides the protocol, not the content.
+Use this skill **alongside** the project's own conventions — it provides the protocol, not the content.

@@ -1,17 +1,27 @@
 # Must-read index pattern
 
-How `CLAUDE.md` lets Claude resolve "which long-term docs do I need to read for this task" automatically.
+How the repo's entry doc (`CLAUDE.md` / `AGENTS.md` / `GEMINI.md`) lets the agent resolve "which long-term docs do I need to read for this task" automatically.
 
 ## The convention
 
-`CLAUDE.md` carries a **scope → required reads** mapping table. When Claude picks up a task, it:
+The entry doc carries a **scope → required reads** mapping table. When the agent picks up a task, it:
 
 1. Identifies the **business scopes** the task hits (a task may hit multiple).
 2. Looks up each scope in the table.
-3. Reads the listed `constitution/*.md` and `requirements/*.md` files (or the relevant sections if a file is huge).
+3. Reads the listed `constitution/*.md` (if present) and `requirements/*.md` files (or the relevant sections if a file is huge); falls back to module READMEs when the scope is module-local.
 4. Only then proposes alternatives.
 
 Reading the index is **non-negotiable** for new features, IA changes, or anything that touches business semantics. Skip only for trivial 1–2 file fixes.
+
+## Repos without an explicit index
+
+Some repos (multi-stack monorepos, repos that already route via `AGENTS.md` skill routing) don't carry a `scope → reads` table. **The pattern still applies** — it just lives in a different shape:
+
+- `AGENTS.md` skill routing rules already partition work by scope (e.g. "protocol packages" → `jetlinks-protocol`, "frontend pages" → `jetlinks-web`).
+- Each task package's `README.md` lists its own must-reads inline, sourced from: `AGENTS.md` skill routing for the relevant scope + module READMEs in the affected paths + matching `requirements/*.md`.
+- Task package authors take 2 minutes at intake to enumerate must-reads instead of looking them up in a global table.
+
+This fallback works fine for small/medium codebases. If a repo grows enough that task authors keep re-deriving the same must-read lists, lift them into an entry-doc table and stop the duplication.
 
 ## Example index in `CLAUDE.md`
 
@@ -69,8 +79,8 @@ Strategy:
 
 ## Where the index lives
 
-- **Primary**: `CLAUDE.md` — single source of truth.
-- **Mirror**: a project's `AGENTS.md` and `GEMINI.md` should point back to `CLAUDE.md`, not duplicate the index.
+- **Primary**: whichever entry doc your repo treats as canonical (`CLAUDE.md`, `AGENTS.md`, or `GEMINI.md`) — single source of truth.
+- **Bridges**: the other entry docs (if multiple are present) should point back to the canonical one, not duplicate the index. For example, multi-stack repos often have `AGENTS.md` as canonical and `CLAUDE.md` as a thin bridge that imports it.
 - **Stale check**: every quarter, scan whether `requirements/*.md` files exist that aren't in the index. Add them.
 
 ## Maintaining the index
@@ -78,13 +88,13 @@ Strategy:
 When a new requirements doc is added:
 
 1. Decide what business scope it covers.
-2. Add a row to the index in `CLAUDE.md`.
+2. Add a row to the index in your canonical entry doc.
 3. If the new doc supersedes an old one, leave the old row pointing at the new file or remove the old row (depending on archive status).
 
 When a requirements doc is **renamed**, run a quick check:
 
 ```bash
-rg "old-name.md" docs CLAUDE.md --glob '!docs/**/_archive/**'
+rg "old-name.md" docs CLAUDE.md AGENTS.md GEMINI.md --glob '!docs/**/_archive/**'
 ```
 
 …and update every reference, including the index.

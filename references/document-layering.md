@@ -6,10 +6,12 @@ Four layers of long-term content. Each layer owns specific kinds of writing; mix
 
 | Layer | Path convention | Owns | Example file |
 |---|---|---|---|
-| **1. Entry** | `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` (root) | Collaboration rules, must-read index, engineering quick-reference, dev troubleshooting | `CLAUDE.md` |
-| **2. Long-term rules** | `docs/constitution/*.md` | Architecture, engineering conventions, UI tokens, service layer rules, ADRs | `docs/constitution/engineering.md` |
+| **1. Entry** | `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` (root) — any one is sufficient as canonical; multi-stack repos often pick `AGENTS.md` as canonical and have `CLAUDE.md` bridge back | Collaboration rules, must-read index, engineering quick-reference, dev troubleshooting | `CLAUDE.md` or `AGENTS.md` |
+| **2. Long-term rules (optional)** | `docs/constitution/*.md` | Architecture, engineering conventions, UI tokens, service layer rules, ADRs | `docs/constitution/engineering.md` |
 | **3. Business blueprints** | `docs/requirements/*.md` | Per-feature specs, fields, flows, IA, page layouts, copy rules | `docs/requirements/module-iot.md` |
 | **4. Per-delivery** | `docs/tasks/YYYY-MM-DD-HHMM-*` | A single delivery's context, plan, verification, handoff | `docs/tasks/2026-05-08-1920-mod-X/` |
+
+**Layer 2 is optional.** Repos whose long-term rules live in module READMEs, or in `AGENTS.md` itself, or simply haven't surfaced cross-cutting rules yet, can skip `docs/constitution/`. The skill works without it — task package must-read lists just point at module READMEs and `AGENTS.md` sections instead. Introduce `docs/constitution/` only when you have rules that genuinely span all features and don't fit any single module.
 
 ## What each layer is forbidden to contain
 
@@ -78,36 +80,37 @@ docs/tasks/YYYY-MM-DD-HHMM-<task-slug>/
 
 Lexical sort = creation order. Two parallel sub-tasks at the same time → use `-A` / `-B` in the slug, not on the timestamp.
 
-## How `CLAUDE.md` ties layers together
+## How the entry doc ties layers together
 
-`CLAUDE.md` carries:
+The canonical entry doc (whichever your repo picks — `CLAUDE.md`, `AGENTS.md`, or `GEMINI.md`) carries:
 
 1. The four-layer taxonomy (this file's content, summarized).
 2. A **must-read index table** — see `must-read-index-pattern.md`.
 3. Engineering quick-reference (1-screen list of "what tech stack, what file lives where").
 4. Common dev troubleshooting (the things that bite this repo specifically).
 
-`CLAUDE.md` does **not** carry:
+The entry doc does **not** carry:
 
 - Long passages of business rules.
-- Detailed architecture diagrams (those live in `constitution/`).
+- Detailed architecture diagrams (those live in `constitution/` if present, or in module READMEs).
 - Per-feature specs (those live in `requirements/`).
 
 ## Anti-patterns this layering prevents
 
 | Smell | Likely violation | Fix |
 |---|---|---|
-| `CLAUDE.md` >800 lines and growing | Mixed in business rules | Move business rules to `requirements/`, keep CLAUDE.md as index |
+| Entry doc (`CLAUDE.md` / `AGENTS.md`) >800 lines and growing | Mixed in business rules | Move business rules to `requirements/`, keep entry doc as index |
 | `requirements/X.md` has TypeScript code blocks defining schemas | Mixed in coding conventions | Move schema rules to `constitution/`, keep field tables in requirements |
 | `constitution/design.md` describes how the iot module's IA works | Mixed in business design | Move IA rules to `requirements/module-iot.md` |
 | `tasks/2026-04-X/` is referenced 6 months later as the canonical spec | Skipped migration | Migrate stable conclusions back up to `requirements/`, archive task |
 
 ## Reading priority when working on a task
 
-1. `CLAUDE.md` (always).
+1. The repo's canonical entry doc (`CLAUDE.md` / `AGENTS.md` / `GEMINI.md`) — always.
 2. `docs/tasks/<current-task>/handoff.md` + `README.md` (always, if a task is in progress).
-3. `docs/constitution/*` files matching the change (for engineering / UI / service work).
+3. `docs/constitution/*` files matching the change, **if present** (for engineering / UI / service work).
 4. `docs/requirements/*` files matching the business scope (for feature work).
-5. The actual code (for implementation).
+5. Module READMEs in the affected paths (especially when no constitution layer exists).
+6. The actual code (for implementation).
 
 The must-read index pattern automates step 3 + 4 — see `references/must-read-index-pattern.md`.
